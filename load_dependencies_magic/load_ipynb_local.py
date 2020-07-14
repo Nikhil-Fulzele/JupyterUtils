@@ -1,18 +1,13 @@
+# Code to make ipynb import work
+# https://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/Importing%20Notebooks.html
 import io
 import os
 import sys
 import types
-import argparse
-import re
 
 from IPython import get_ipython
-from IPython.core.magic import register_cell_magic
 from IPython.core.interactiveshell import InteractiveShell
-from io import StringIO
 from nbformat import read
-parser = argparse.ArgumentParser()
-parser.add_argument('--alias', type = str, required = False)
-parser.add_argument('--override', type = bool, required = False)
 
 
 def find_notebook(fullname, path=None):
@@ -62,12 +57,12 @@ class NotebookLoader(object):
         self.shell.user_ns = mod.__dict__
 
         try:
-          for cell in nb.cells:
-            if cell.cell_type == 'code':
-                # transform the input to executable Python
-                code = self.shell.input_transformer_manager.transform_cell(cell.source)
-                # run the code in themodule
-                exec(code, mod.__dict__)
+            for cell in nb.cells:
+                if cell.cell_type == 'code':
+                    # transform the input to executable Python
+                    code = self.shell.input_transformer_manager.transform_cell(cell.source)
+                    # run the code in themodule
+                    exec(code, mod.__dict__)
         finally:
             self.shell.user_ns = save_user_ns
         return mod
@@ -78,7 +73,7 @@ class NotebookFinder(object):
     def __init__(self):
         self.loaders = {}
 
-    def find_module(self, fullname, path=None):
+    def find_module(self, fullname, path='.'):
         nb_path = find_notebook(fullname, path)
         if not nb_path:
             return
@@ -91,20 +86,3 @@ class NotebookFinder(object):
         if key not in self.loaders:
             self.loaders[key] = NotebookLoader(path)
         return self.loaders[key]
-
-
-def load_deps(cell_info):
-    buf = cell_info.getvalue().strip().split('\n')
-    for line in buf:
-        line = line.split()
-        file_name = line[0]
-        args = parser.parse_args(line[1:])
-        params = vars(args)
-        print(file_name, params)
-
-
-@register_cell_magic
-def hello(line, cell):
-    sio = StringIO(cell)
-    load_deps(sio)
-    sys.meta_path.append(NotebookFinder())
