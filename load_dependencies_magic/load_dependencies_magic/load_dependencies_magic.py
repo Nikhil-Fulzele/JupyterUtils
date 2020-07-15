@@ -1,12 +1,7 @@
 import os
-import sys
 import argparse
 
-from IPython.core.magic import register_line_cell_magic
-from io import StringIO
-
-from load_ipynb_local import NotebookFinder
-from utils import download_files
+from load_dependencies_magic.utils import download_files
 
 ACCEPTED_FILE_EXT = ['ipynb', 'csv', 'py', 'txt']
 
@@ -62,14 +57,4 @@ def parse_cell(cell_info):
     return load_nbloader
 
 
-@register_line_cell_magic
-def load_dependencies(line, cell=None):
-    if not line:
-        load_nbloader = True
-    else:
-        sio = StringIO(cell)
-        load_nbloader = parse_cell(sio)
-
-    if load_nbloader:
-        sys.meta_path.append(NotebookFinder())
 
