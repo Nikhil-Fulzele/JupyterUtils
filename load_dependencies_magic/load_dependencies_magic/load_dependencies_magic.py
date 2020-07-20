@@ -3,8 +3,6 @@ import argparse
 
 from load_dependencies_magic.utils import download_files
 
-ACCEPTED_FILE_EXT = ['ipynb', 'csv', 'py', 'txt']
-
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -17,26 +15,23 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-parser_cell = argparse.ArgumentParser(add_help=True)
-parser_cell.add_argument('--alias', type=str, required=False)
-parser_cell.add_argument('--override', default=False, type=str2bool, required=False)
-
-parse_line = argparse.ArgumentParser(add_help=True)
-parser_cell.add_argument('--remote', default="", type=str, required=False)
+cell_parser = argparse.ArgumentParser(add_help=True)
+cell_parser.add_argument('--alias', type=str, required=False)
+cell_parser.add_argument('--override', default=False, type=str2bool, required=False)
 
 
 def parse_cell(cell_info):
+
     load_nbloader = False
     buf = cell_info.getvalue().strip().split('\n')
+
     for line in buf:
 
         line = line.split()
         file_path = line[0]
         file_ext = file_path.split('.')[-1]
-        if file_ext not in ACCEPTED_FILE_EXT:
-            raise Exception(f"Illegal file type : {file_ext}. Currently it supports only .ipynb, .csv, .py and .txt")
 
-        args = parser_cell.parse_args(line[1:])
+        args = cell_parser.parse_args(line[1:])
         params = vars(args)
         alias = file_path.split('/')[-1] if not params['alias'] else params['alias']
 
@@ -50,11 +45,8 @@ def parse_cell(cell_info):
             else:
                 print(f"Loading {file_path} and saving it as {alias}")
 
-        download_files(file_path, alias, file_type=file_ext)
+        download_files(file_path, alias)
         if file_ext == 'ipynb':
             load_nbloader = True
 
     return load_nbloader
-
-
-

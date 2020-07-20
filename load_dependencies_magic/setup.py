@@ -18,7 +18,8 @@ setup(
     version="0.0.1dev0",
     author="Nikhil Fulzele",
     author_email="nikhilf99@gmail.com",
-    description="Notebook magic to load dependencies like .ipynb, .csv, .py, .txt located on remote server importable",
+    description="Notebook magic to load dependencies like .ipynb, .csv, .py, .txt, etc... "
+                "located on remote server importable",
     license="MIT",
     packages=packages,
     install_requires=requirements

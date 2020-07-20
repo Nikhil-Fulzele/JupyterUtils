@@ -12,9 +12,11 @@ from load_dependencies_magic.load_dependencies_magic import parse_cell
 class LoadDependencies(Magics):
 
     @line_cell_magic
-    def load_dependencies(self, line, cell=None):
+    def load_dependencies(self, line=None, cell=None):
+
         if not line:
             load_nbloader = True
+
         else:
             sio = StringIO(cell)
             load_nbloader = parse_cell(sio)
